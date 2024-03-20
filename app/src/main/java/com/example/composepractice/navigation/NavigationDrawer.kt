@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.Favorite
@@ -43,13 +44,20 @@ fun NavigationDrawer() {
     val scope = rememberCoroutineScope()
     val items = listOf(
         DrawerItem(icon = Icons.Default.Favorite, label = "Likes", secondaryLabel = "64"),
-        DrawerItem(icon = Icons.Default.Face, label = "Messages", secondaryLabel = "12"),
+        DrawerItem(icon = Icons.Default.Face, label = "Gente", secondaryLabel = "12"),
         DrawerItem(icon = Icons.Default.MailOutline, label = "Mail", secondaryLabel = "4"),
         DrawerItem(icon = Icons.Default.Settings, label = "Settings", secondaryLabel = ""),
     )
     var selectedItem by remember {
         mutableStateOf(items[0])
     }
+    var people by remember {
+        mutableStateOf(PeopleState())
+    }
+    val peopleRequest = listOf(
+        Person(name = "Candentey", age = 68),
+        Person(name = "Marcozz", age = 56),
+    )
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -70,8 +78,13 @@ fun NavigationDrawer() {
                         label = { Text(text = item.label) },
                         selected = item == selectedItem,
                         onClick = {
-                            scope.launch { drawerState.close() }
+                            if (item.label === "Gente") {
+                                people = people.copy(
+                                    peopleRequest
+                                )
+                            }
                             selectedItem = item
+                            scope.launch { drawerState.close() }
                         },
                         icon = { Icon(imageVector = item.icon, contentDescription = item.label) },
                         badge = { Text(text = item.secondaryLabel) },
@@ -81,9 +94,12 @@ fun NavigationDrawer() {
             }
         },
         content = {
-            Content(onMenuIconClick = {
-                scope.launch { drawerState.open() }
-            })
+            Content(
+                onMenuIconClick = {
+                    scope.launch { drawerState.open() }
+                },
+                people
+            )
         }
     )
 }
@@ -94,10 +110,20 @@ data class DrawerItem(
     val secondaryLabel: String,
 )
 
+data class Person(
+    val name: String,
+    val age: Number
+)
+
+data class PeopleState(
+    val people: List<Person> = emptyList()
+)
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Content(
-    onMenuIconClick: () -> Unit
+    onMenuIconClick: () -> Unit,
+    people: PeopleState
 ) {
     Scaffold(
         topBar = {
@@ -117,13 +143,8 @@ fun Content(
                 .padding(padding),
             contentPadding = PaddingValues(16.dp)
         ) {
-            items(50) {
-                androidx.compose.material3.ListItem(
-                    headlineContent = { Text(text = "Item $it") },
-                    leadingContent = {
-                        Icon(imageVector = Icons.Default.Face, contentDescription = null)
-                    }
-                )
+            items(people.people) { person ->
+                androidx.compose.material3.ListItem(headlineContent = { Text(text = person.name) })
             }
         }
     }
