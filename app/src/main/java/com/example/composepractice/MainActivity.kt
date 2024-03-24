@@ -23,13 +23,13 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
 //                    NavigationDrawer()
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.TopCenter
-                    ) {
-                        DockedSearchBar()
-                    }
-
+//                    Box(
+//                        modifier = Modifier.fillMaxSize(),
+//                        contentAlignment = Alignment.TopCenter
+//                    ) {
+//                        DockedSearchBar()
+//                    }
+                    SearchTextField()
                 }
             }
         }
